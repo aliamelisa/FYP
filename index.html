@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bright Kids - Child Development Predictor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url('/static/images/download.jpg');
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        select,
+        input {
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .secondary-btn {
+            background-color: #28a745;
+        }
+
+        .secondary-btn:hover {
+            background-color: #1e7e34;
+        }
+
+        .section-title {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #444;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <h1>Bright Kids ★</h1>
+
+    <!-- Form for New Prediction -->
+    <div class="form-section">
+        <div class="section-title">Enter Your Child's Information</div>
+        <form method="POST" action="/predict">
+            <label for="SCREENTIME_C">Screen Time Per Day:</label>
+            <select name="SCREENTIME_C" id="SCREENTIME_C" required>
+                <option value="1">More than 2 hours</option>
+                <option value="2">2 hours or less</option>
+            </select>
+
+            <label for="SEX_C">Gender:</label>
+            <select name="SEX_C" id="SEX_C" required>
+                <option value="1">Male</option>
+                <option value="2">Female</option>
+            </select>
+
+            <label for="AGEP_C">Age (Years):</label>
+            <input type="number" name="AGEP_C" id="AGEP_C" min="1" max="17" required>
+
+
+                <button type="submit">Predict</button>
+            </form>
+    </div>
+
+    <!-- Form to Retrieve or Update Existing Prediction -->
+    <div class="form-section">
+        <div class="section-title">Already Have a Session ID?</div>
+        <form method="POST" action="/retrieve">
+            <label for="session_id">Enter Session ID:</label>
+            <input type="text" name="session_id" id="session_id" required>
+
+            <button type="submit" class="secondary-btn">View Past Result</button>
+        </form>
+
+        <form method="POST" action="/update-form">
+            <input type="hidden" name="session_id" id="session_id_update">
+            <button type="submit" class="secondary-btn" style="margin-top: 10px;">Update Child Info</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('session_id').addEventListener('input', function () {
+            document.getElementById('session_id_update').value = this.value;
+        });
+    </script>
+
+
+    <script>
+        // Copy session ID input to both forms
+        const sessionInput = document.getElementById('session_id');
+        const updateInput = document.getElementById('session_id_update');
+
+        sessionInput.addEventListener('input', function () {
+            updateInput.value = sessionInput.value;
+        });
+    </script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Retrieve Session</title>
+</head>
+<body>
+    <h1>Retrieve Past Result</h1>
+    <form method="POST">
+        <label>Enter Session ID:</label>
+        <input type="text" name="session_id" required>
+        <button type="submit">Retrieve</button>
+    </form>
+    {% if error %}
+        <p style="color:red">{{ error }}</p>
+    {% endif %}
+</body>
+</html>

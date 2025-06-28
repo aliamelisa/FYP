@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Child Development Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .status {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .normal {
+            color: green;
+        }
+
+        .risk {
+            color: red;
+        }
+
+        .score {
+            font-size: 0.95em;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .recommendation {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .recommendation h2 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .recommendation ul {
+            padding-left: 20px;
+        }
+
+        .recommendation li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .info-icon {
+            display: inline-block;
+            margin-left: 6px;
+            color: #555;
+            cursor: pointer;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .info-icon:hover .tooltip {
+            display: block;
+        }
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            color: #333;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 280px;
+            top: 24px;
+            left: -120px;
+            z-index: 10;
+            font-size: 0.85em;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Prediction Results On The Development Aspects</h1>
+
+    {% if session_id %}
+    <p style="text-align: center; font-weight: bold; color: #333;">
+        Your session ID is {{ session_id }}. Use this ID to view or update your results later.
+    </p>
+    {% endif %}
+
+    {% if prediction_results %}
+    <div class="dashboard">
+        {% for target, result in prediction_results.items() %}
+        <div class="card">
+            <h3>
+                {{ target }}
+                <span class="info-icon">i
+                    <span class="tooltip">
+                        {% if target == 'Emotional Difficulties' %}
+                        This is when your child struggles to manage their feelings...
+                        {% elif target == 'Conduct Problems' %}
+                        This refers to a consistent pattern where your child breaks rules...
+                        {% elif target == 'Hyperactivity' %}
+                        If your child is constantly on the go, can't sit still...
+                        {% elif target == 'Peer Problems' %}
+                        This means your child is having a hard time getting along...
+                        {% endif %}
+                    </span>
+                </span>
+            </h3>
+            <div class="status {{ 'risk' if result.status == 'At Risk' else 'normal' }}">
+                {{ result.status }}
+            </div>
+            <div class="score">Score: {{ result.probability }}%</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!--  PIE CHART SECTION -->
+    <div class="card" style="max-width: 400px; margin: 0 auto; margin-top: 30px;">
+        <h3 style="text-align: center;">Overall Development Risk Breakdown</h3>
+        <canvas id="riskPieChart" width="200" height="200"></canvas>
+
+        {% set raw_values = [
+            prediction_results["Emotional Difficulties"]["probability"],
+            prediction_results["Conduct Problems"]["probability"],
+            prediction_results["Hyperactivity"]["probability"],
+            prediction_results["Peer Problems"]["probability"]
+        ] %}
+        {% set total = raw_values | sum %}
+        <div id="chart-data"
+            data-labels='["Emotional Difficulties", "Conduct Problems", "Hyperactivity", "Peer Problems"]'
+            data-values='[
+                {{ (raw_values[0] * 100 / total) | round(2) }},
+                {{ (raw_values[1] * 100 / total) | round(2) }},
+                {{ (raw_values[2] * 100 / total) | round(2) }},
+                {{ (raw_values[3] * 100 / total) | round(2) }}
+            ]'>
+        </div>
+    </div>
+    <!--  END PIE CHART SECTION -->
+
+    <div class="recommendation" style="margin-top: 40px;">
+        <h2>Recommendations for Parents</h2>
+        <ul>
+            <li>Educate yourself about the side effects of overusing technology.</li>
+            <li>Take an active role in limiting your child’s screen time and internet access.</li>
+            <li>Encourage more outdoor activities and physical play.</li>
+            <li>Promote participation in household chores to support responsibility and discipline.</li>
+        </ul>
+    </div>
+    {% else %}
+    <p>No predictions available.</p>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('index') }}">
+            <button style="padding: 10px 20px; font-size: 16px; border-radius: 8px; background-color: #007bff; color: white; border: none; cursor: pointer;">
+                ⬅ Back to Home
+            </button>
+        </a>
+    </div>
+
+    <!-- ✅ PIE CHART SCRIPT -->
+    <script>
+        const chartDataDiv = document.getElementById('chart-data');
+        const labels = JSON.parse(chartDataDiv.getAttribute('data-labels'));
+        const values = JSON.parse(chartDataDiv.getAttribute('data-values'));
+
+        const ctx = document.getElementById('riskPieChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

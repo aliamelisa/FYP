@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 80px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: bold;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #007BFF;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Update Child Data</h1>
+<form method="POST" action="/update/{{ record[0] }}">
+        <label>Screen Time:</label>
+        <select name="SCREENTIME_C" required>
+            <option value="1" {% if record[1] == 1 %}selected{% endif %}>More than 2 hours</option>
+            <option value="2" {% if record[1] == 2 %}selected{% endif %}>2 hours or less</option>
+        </select>
+
+        <label>Sex:</label>
+        <select name="SEX_C" required>
+            <option value="1" {% if record[2] == 1 %}selected{% endif %}>Male</option>
+            <option value="2" {% if record[2] == 2 %}selected{% endif %}>Female</option>
+        </select>
+
+        <label>Age:</label>
+        <input type="number" name="AGEP_C" min="1" max="17" value="{{ record[3] }}" required>
+
+        <button type="submit">Update and Predict</button>
+    </form>
+    <a href="/" class="back-link">← Back to Home</a>
+</div>
+
+</body>
+</html>
